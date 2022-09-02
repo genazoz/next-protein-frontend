@@ -1,25 +1,29 @@
+import App from "next/app";
 import type {AppProps} from 'next/app'
 import {Router, useRouter} from "next/router";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import {useSelector} from "react-redux";
 import {ThemeProvider} from "styled-components";
 import nProgress from "nprogress";
 
+import '/public/fonts/fonts.sass'
 import GlobalStyles from "../styles/GlobalStyles";
 import theme from "../styles/theme";
-import '../styles/globals.sass'
-import '/public/fonts/fonts.sass'
 import {wrapper} from "../app/store";
-import {setShowAuthModal, settingsSelector} from "../features/settings/settingsSlice";
-import {Header, Preloader, RouteGuard, Transition} from "../components";
+import {settingsSelector} from "../features/settings/settingsSlice";
 import {Api} from "../utils/api";
 import {setUserData} from "../features/user/userSlice";
-import App from "next/app";
 import PrivatePaths from "../utils/privatePaths";
+import RouteGuard from '../components/RouteGuard';
+import Transition from '../components/Transition';
 
 Router.events.on("routeChangeStart", nProgress.start);
 Router.events.on("routeChangeError", nProgress.done);
 Router.events.on("routeChangeComplete", nProgress.done);
+
+const DynamicHeader = dynamic(() => import(/*webpackChunkName: "Header_DYNAMIC_IMPORT"*/'../components/Header'))
+const DynamicPreloader = dynamic(() => import(/*webpackChunkName: "Preloader_DYNAMIC_IMPORT"*/'../components/Preloader'))
 
 function MyApp({Component, pageProps}: AppProps) {
   const {showPreloader} = useSelector(settingsSelector);
@@ -31,8 +35,8 @@ function MyApp({Component, pageProps}: AppProps) {
         <title>Protein Next</title>
       </Head>
       <GlobalStyles/>
-      <Header/>
-      {showPreloader && <Preloader selector={'#preloader-root'}/>}
+      <DynamicHeader/>
+      {showPreloader && <DynamicPreloader selector={'#preloader-root'}/>}
       <RouteGuard>
         <Transition location={router.pathname}>
           <Component {...pageProps} />

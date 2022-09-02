@@ -11,7 +11,7 @@ const Button = styled.button<{theme: string, fullwidth: boolean, icon: string, d
 
   width: max-content;
   height: 35px;
-  padding: 1px 48px 0 48px;
+  padding: 2px 48px 0;
 
   font-family: ${theme.fonts.bebasB};
   font-size: 13px;
@@ -19,6 +19,19 @@ const Button = styled.button<{theme: string, fullwidth: boolean, icon: string, d
   cursor: pointer;
   border: 0px;
   border-radius: 5px;
+
+  @media (max-width: ${theme.media.mob}) {
+    height: 38px;
+    padding: 3px 35px 0;
+
+    font-size: 14px;
+  }
+
+  @media (max-width: ${theme.media.mobSm}) {
+    height: 35px;
+
+    font-size: 13px;
+  }
   
   i {
     margin: -2px 0 0 12px;

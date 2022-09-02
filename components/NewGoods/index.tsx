@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
+import dynamic from "next/dynamic";
 import styled from "styled-components";
+import { CSSTransition } from 'react-transition-group';
+
 import theme from "../../styles/theme";
-import {useKeenSlider} from "keen-slider/react"
-import "keen-slider/keen-slider.min.css"
-import {CardCatalog, Footer} from "../";
+import {Footer} from "../";
 import Button from "../Button";
 import Logo from "../Logo";
 import {ResponseProduct} from "../../utils/api/types";
@@ -20,7 +21,7 @@ const Section = styled.section`
   height: 100%;
   margin: auto;
   padding: 0 0 40px 0;
-  
+
   @media (max-width: ${theme.media.desktopSm}) {
     padding: 0;
   }
@@ -40,13 +41,38 @@ const HeaderWrapper = styled.div`
   @media (max-height: 600px) {
     margin: 0;
   }
-  @media (max-height: 500px) {
+  @media (max-height: 700px) {
     display: none;
   }
 `;
 const LogoWrapper = styled.h2`
-  margin: 0 0 35px;
+  margin: 30px 0 35px;
 
+  opacity: 0;
+
+  transition: .5s margin, .5s opacity;
+
+  .new-goods-enter & {
+    margin: 30px 0 35px;
+    
+    opacity: 0;
+    
+    transition-delay: .5s;
+  }
+  .new-goods-enter-active & {
+    margin: 0 0 35px;
+    opacity: 1;
+  }
+  .new-goods-enter-done & {
+    margin: 0 0 35px;
+    opacity: 1;
+  }
+  .new-goods-exit-active & {
+    margin: 30px 0 35px;
+    opacity: 0;
+    transition: .5s margin, .5s opacity;
+  }
+  
   @media (max-width: ${theme.media.mob}) {
     margin: 0 0 30px;
   }
@@ -54,32 +80,84 @@ const LogoWrapper = styled.h2`
 const Subtitle = styled.p`
   width: 500px;
   max-width: 100%;
+  margin: 30px 0 0;
 
-  font-size: 15px;
+  font-size: 16px;
   color: #bbb;
 
-  @media (max-height: 600px) {
+  opacity: 0;
+
+  transition: .5s margin, .5s opacity;
+
+  .new-goods-enter & {
+    margin: 30px 0 0;
+    
+    opacity: 0;
+
+    transition-delay: .5s;
+  }
+  .new-goods-enter-active & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-enter-done & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-exit & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-exit-active & {
+    margin: 30px 0 0;
+    opacity: 0;
+    transition: .5s margin, .5s opacity;
+  }
+
+  @media (max-height: ${theme.media.mobSm}) {
     font-size: ${theme.fontSizes.s};
   }
 `;
 const ButtonWrapper = styled.div`
-  margin-top: 25px;
-  
+  margin: 55px 0 0;
+
+  opacity: 0;
+
+  transition: .5s margin, .5s opacity;
+
+  .new-goods-enter & {
+    margin: 55px 0 0;
+    
+    opacity: 0;
+    
+    transition-delay: .5s;
+  }
+  .new-goods-enter-active & {
+    margin: 25px 0 0;
+    opacity: 1;
+  }
+  .new-goods-enter-done & {
+    margin: 25px 0 0;
+    opacity: 1;
+  }
+  .new-goods-exit & {
+    margin: 25px 0 0;
+    opacity: 1;
+  }
+  .new-goods-exit-active & {
+    margin: 55px 0 0;
+    opacity: 0;
+    transition: .5s margin, .5s opacity;
+  }
+
   i {
     background-color: ${theme.colors.green};
-  }
-`;
-const GoodsSlider = styled.div`
-  padding: 30px 0;
-
-  @media (max-width: ${theme.media.mob}) {
-    width: 100%;
   }
 `;
 const FooterSection = styled(Section)`
   position: absolute;
   bottom: 0;
-  
+
   height: max-content;
   padding: 0 calc((100% - 1320px) / 2);
 
@@ -109,130 +187,112 @@ const FooterWrapper = styled.div`
     display: none;
   }
 `;
-const GoodsSlide = styled.div`
-  overflow: visible !important;
+const CardsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 30px 0 0;
+  padding: 30px 0 0;
+  
+  gap: 30px;
+
+  opacity: 0;
+
+  transition: .5s margin, .5s opacity;
+
+  .new-goods-enter & {
+    margin: 30px 0 0;
+    
+    opacity: 0;
+    
+    transition-delay: .5s;
+  }
+  .new-goods-enter-active & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-enter-done & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-exit & {
+    margin: 0;
+    opacity: 1;
+  }
+  .new-goods-exit-active & {
+    margin: 30px 0 0;
+    opacity: 0;
+    transition: .5s margin, .5s opacity;
+  }
+
+
+  @media (max-width: ${theme.media.desktop}) {
+    gap: 45px;
+  }
+  @media (max-width: ${theme.media.tab}) {
+    gap: 30px;
+  }
+  
+  & > div {
+    width: 250px;
+    flex-shrink: 0;
+
+    @media (max-width: ${theme.media.mob}) {
+      width: 200px;
+
+      & > div {
+        height: 250px;
+      }
+    }
+    @media (max-width: ${theme.media.mobSm}) {
+      width: 160px;
+      
+      & > div {
+        height: 200px;
+      }
+    }
+  }
 `
 
 type NewGoodsProps = {
-  items: ResponseProduct[]
+  items: ResponseProduct[],
+  isShow: boolean
 }
 
-export const NewGoods: React.FC<NewGoodsProps> = ({items}) => {
-  const [options,setOptions] = useState({});
-  useEffect(()=>{
-    setTimeout(() => setOptions({
-      loop: true,
-      rtl: true,
-      slides: {
-        perView: 5,
-        spacing: 55,
-        origin: "center",
-      },
-      breakpoints: {
-        '(min-width: 0px)': {
-          slides: {
-            perView: 1.4,
-            spacing: 20,
-            origin: "center",
-          }
-        },
-        '(min-width: 500px)': {
-          slides: {
-            perView: 2,
-            spacing: 20,
-            origin: "center",
-          }
-        },
-        '(min-width: 600px)': {
-          slides: {
-            perView: 4,
-            spacing: 30,
-            origin: "center",
-          }
-        },
-        '(min-width: 900px)': {
-          slides: {
-            perView: 5,
-            spacing: 30,
-            origin: "center",
-          }
-        },
-        '(min-width: 1200px)': {
-          slides: {
-            perView: 6,
-            spacing: 30,
-            origin: "center",
-          }
-        },
-        '(min-width: 1400px)': {
-          slides: {
-            perView: 7,
-            spacing: 30,
-            origin: "center",
-          }
-        },
-        '(min-width: 1700px)': {
-          slides: {
-            perView: 6,
-            spacing: 45,
-            origin: "center",
-          }
-        },
-        '(min-width: 2100px)': {
-          slides: {
-            perView: 7,
-            spacing: 55,
-            origin: "center",
-          }
-        },
-        '(min-width: 2600px)': {
-          slides: {
-            perView: 10,
-            spacing: 55,
-            origin: "center",
-          }
-        },
-        '(min-width: 2800px)': {
-          slides: {
-            perView: 14,
-            spacing: 55,
-            origin: "center",
-          }
-        }
-      },
-    }), 500)
-  }, [])
+const DynamicCardCatalog = dynamic(() => import(/*webpackChunkName: "CardCatalog_DYNAMIC_IMPORT"*/'../CardCatalog'))
 
-  const [ref] = useKeenSlider<HTMLDivElement>(options)
-
+const NewGoods: React.FC<NewGoodsProps> = ({items, isShow}) => {
   return (
-    <Section>
+    <CSSTransition in={isShow} classNames={'new-goods'} timeout={400} unmountOnExit>
+      <Section>
       <HeaderWrapper>
         <LogoWrapper>
-          <Logo text={"Новинки"} big />
+          <Logo text={"Новинки"} big/>
         </LogoWrapper>
         <Subtitle>
-          Продукция номер один в России в категории натуральные препараты для укрепления здоровья и повышения качества жизни*
+          Продукция номер один в России в категории натуральные препараты для укрепления здоровья и повышения качества
+          жизни*
           На сайте вы можете найти такую продукцию как протеин, гейнеры, аргинин, БЦА, шейкеры и многое другое!
         </Subtitle>
         <ButtonWrapper>
           <Button theme={'green'} text={"Перейти в каталог"} type={"link"} href={"/catalog"}></Button>
         </ButtonWrapper>
       </HeaderWrapper>
-      <GoodsSlider ref={ref} className="keen-slider">
+      <CardsWrapper>
         {
-          items.map((goods, index) => (
-            <GoodsSlide key={goods.id} className={"keen-slider__slide number-slide" + index}>
-              <CardCatalog {...goods} />
-            </GoodsSlide>
-          ))
+          items.map(goods =>
+            <DynamicCardCatalog key={goods.id} {...goods} />
+          )
         }
-      </GoodsSlider>
+      </CardsWrapper>
       <FooterSection>
         <FooterWrapper>
           <Footer isFull={true}/>
         </FooterWrapper>
       </FooterSection>
     </Section>
+    </CSSTransition>
   );
 }
+
+export default NewGoods;

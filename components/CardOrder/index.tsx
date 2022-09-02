@@ -3,7 +3,8 @@ import styled from "styled-components";
 
 import theme from "../../styles/theme";
 import Link from "next/link";
-import {ResponseProduct} from "../../utils/api/types";
+import {ResponseOrderProduct} from "../../utils/api/types";
+import Image from "next/future/image";
 
 const Card = styled.div`
   position: relative;
@@ -48,7 +49,7 @@ const ImageWrapper = styled.div`
   
   cursor: pointer;
 `;
-const Image = styled.img`
+const Img = styled.img`
   z-index: 1;
 
   width: 100%;
@@ -74,12 +75,12 @@ const Elements = styled.div`
   align-items: center;
   margin-left: auto`
 
-export const CardOrder: React.FC<ResponseProduct> = ({id, imageUrl, title, price, category}) => {
+export const CardOrder: React.FC<ResponseOrderProduct> = ({prodId, imageUrl}) => {
   return (
     <Card>
-      <Link href={`/card/${id}`}>
+      <Link href={`/card/${prodId}`}>
         <ImageWrapper>
-          <Image width="300" height="300" src={`/img/${imageUrl}.png`} alt=""/>
+          <Img as={Image} width="300" height="300" src={`/img/${imageUrl}.png`} alt=""/>
         </ImageWrapper>
       </Link>
       <Elements>

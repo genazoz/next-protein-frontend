@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import {GetServerSideProps, NextPage} from "next";
-import "swiper/css";
 
 import theme from "../../styles/theme";
 import {ResponseProduct} from "../../utils/api/types";
@@ -10,6 +9,9 @@ import {Related, Counter} from "../../components";
 import {addItem} from "../../features/cart/cartSlice";
 import {Loader} from "../../components/Loader";
 import {Api} from "../../utils/api";
+import Image from "next/future/image";
+import TruckIco from '../../public/svg/truck.svg'
+import LocationIco from '../../public/svg/location.svg'
 
 const Id = styled.div`
   overflow: hidden;
@@ -67,10 +69,11 @@ const ImageWrapper = styled.div`
   @media (max-width: ${theme.media.tab}) {
   }
 `;
-const Image = styled.img`
+const Img = styled.img`
   position: absolute;
 
   width: 530px;
+  height: auto;
 
   @media (max-width: ${theme.media.tab}) {
     width: 400px;
@@ -117,12 +120,12 @@ const PreviewPrice = styled.div`
     display: none;
   }
 `;
-const PreviewButton = styled.button`
+const PreviewButton = styled.button<{count: number}>`
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 130px;
+  width: 150px;
   height: 35px;
   padding: 0px 32px 1px 32px;
 
@@ -163,7 +166,30 @@ const PreviewButton = styled.button`
 
       transform: scale(1.4);
     }
+    &:after {
+      display: none;
+    }
   }
+  
+  ${props => props.count && `
+    &::after{
+      content: '${props.count}';
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 15.5px;
+      height: 14.5px;
+      margin: 1px 0 0 7px;
+      padding: 1px 0 0;
+      
+      font-size: 10px;
+      color:  ${theme.colors.darkBlue};
+  
+      border-radius: 50%;
+      background: ${theme.colors.green};
+    }
+  `}
 `;
 const Footer = styled.div`
   overflow: hidden;
@@ -180,46 +206,30 @@ const Footer = styled.div`
     border-radius: unset;
   }
 
-  .flexRow {
-    margin-top: 10px;
-    width: 100%;
-    font-family: ${theme.fonts.dinCondM};
-    color: ${theme.colors.darkBlue};
-    font-size: 16px;
-
-    @media (max-width: 390px) {
-      font-size: 14px;
-    }
-    
-    i {
-      width: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 2px;
-      float: left;
-      margin-right: 8px;
-    }
-  }
-
-  .flexRow_margin {
-    @media (max-width: ${theme.media.mob}) {
-      margin-top: 10px;
-    }
-    @media (max-width: 390px) {
-      margin-top: 10px;
-    }
-  }
-
-  .item-flexRow {
-    display: flex;
-    width: 100%;
-
-    @media (max-width: ${theme.media.tab}) {
-      flex-direction: column;
-    }
-  }
 `;
+const Infos = styled.div`
+  display: flex;
+  width: 100%;
+
+  @media (max-width: ${theme.media.tab}) {
+    flex-direction: column;
+  }
+`
+const Info = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+
+  font-family: ${theme.fonts.dinCondM};
+  font-size: 16px;
+  color: ${theme.colors.darkBlue};
+
+  @media (max-width: 390px) {
+    font-size: 14px;
+  }
+`
 const Description = styled.div`
   display: flex;
   flex-direction: column;
@@ -250,7 +260,7 @@ const DescriptionText = styled.p`
 
   color: ${theme.colors.darkBlue};
 `;
-const DescriptionName = styled(DescriptionText)`
+const Name = styled(DescriptionText)`
   font-size: 70px;
   font-family: ${theme.fonts.bebasB};
 
@@ -258,7 +268,7 @@ const DescriptionName = styled(DescriptionText)`
     display: none;
   }
 `;
-const DescriptionAboutText = styled(DescriptionText)`
+const AboutText = styled(DescriptionText)`
   width: 60%;
   margin: 5px 0 0 0;
 
@@ -273,7 +283,7 @@ const DescriptionAboutText = styled(DescriptionText)`
     font-size: 14px;
   }
 `;
-const DescriptionCategory = styled(DescriptionText)`
+const Category = styled(DescriptionText)`
   margin: 20px 0 5px 0;
 
   font-family: ${theme.fonts.bebasB};
@@ -286,16 +296,17 @@ const DescriptionCategory = styled(DescriptionText)`
     font-size: 18px;
   }
 `;
-const DescriptionAmount = styled(DescriptionCategory)`
+const Amount = styled(Category)`
 `;
-const DescriptionButton = styled.button`
+const Button = styled.button<{count: number}>`
   display: none;
+  justify-content: center;
+  align-items: center;
   width: max-content;
-  height: 40px;
+  height: 45px;
   margin-top: 30px;
-  padding: 0 40px;
+  padding: 2px 40px 0;
 
-  font-family: ${theme.fonts.dinCondM};
   font-size: 14px;
   color: white;
 
@@ -304,20 +315,55 @@ const DescriptionButton = styled.button`
   border: 0;
 
   &::before {
-    margin: auto;
     content: "Добавить в корзину";
   }
 
   @media (max-width: ${theme.media.tab}) {
     display: flex;
   }
-  @media (max-width: ${theme.media.mob}) {
-    width: 100%;
-  }
   @media (max-width: ${theme.media.mobSm}) {
     margin-top: 20px;
   }
+
+  ${props => props.count && `
+    &::after{
+      content: '${props.count}';
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      margin: -2px 0 0 7px;
+      padding: 1px 0 0;
+      
+      font-size: 12px;
+      color:  ${theme.colors.darkBlue};
+  
+      border-radius: 50%;
+      
+      background: ${theme.colors.green};
+      
+      @media (max-width: ${theme.media.mobSm}) {
+        width: 14.5px;
+        height: 14.5px;
+        font-size: 10.5px;
+      }
+    }
+  `}
 `;
+const TruckIcon = styled.svg`
+  width: 22px;
+  height: 22px;
+  
+  fill: ${theme.colors.darkBlue};
+`
+const LocationIcon = styled.svg`
+  width: 17px;
+  height: 17px;
+
+  fill: ${theme.colors.darkBlue};
+`
 
 interface CardProps {
   products: ResponseProduct[],
@@ -350,31 +396,31 @@ const Card:NextPage<CardProps> = ({ products, goods}) => {
       <Preview>
           <ImageWrapper>
           <Circle/>
-          <Image src={`/img/${goods.imageUrl}.png`} alt="item"/>
+          <Img as={Image} src={`/img/${goods.imageUrl}.png`} alt="item" width={800} height={800}/>
         </ImageWrapper>
       </Preview>
       <Footer>
         <Description>
           <PreviewPrice>{goods.price}Р</PreviewPrice>
-          <DescriptionName>{goods.title}</DescriptionName>
-          <DescriptionCategory>Описание</DescriptionCategory>
-          <DescriptionAboutText>
+          <Name>{goods.title}</Name>
+          <Category>Описание</Category>
+          <AboutText>
             Have A Rest – это прежде всего комфорт, красота, стиль и
             технологичность.Мы хотим, чтобы каждая твоя поездка была просто
             незабываемой, а наши аксессуары не переставали
-          </DescriptionAboutText>
-          <DescriptionAmount>Количество</DescriptionAmount>
+          </AboutText>
+          <Amount>Количество</Amount>
           <Counter onChangeCount={onChangeCount}/>
-          <div className="item-flexRow">
-            <div className="flexRow flexRow_margin">
-              <i className="fas fa-truck"></i> Бесплатная доставка от 3000р
-            </div>
-            <div className="flexRow">
-              <i className="fas fa-map-marker-alt"></i> Есть в наличии
-            </div>
-          </div>
-          <DescriptionButton onClick={onClickAddToCartButton}/>
-          <PreviewButton onClick={onClickAddToCartButton}/>
+          <Infos>
+            <Info>
+              <TruckIcon as={TruckIco}/> Бесплатная доставка от 3000р
+            </Info>
+            <Info>
+              <LocationIcon as={LocationIco}/>  Есть в наличии
+            </Info>
+          </Infos>
+          <Button count={count} onClick={onClickAddToCartButton}/>
+          <PreviewButton count={count} onClick={onClickAddToCartButton}/>
         </Description>
         <Related items={products}/>
       </Footer>

@@ -1,17 +1,19 @@
 import React, {useEffect} from "react";
 import styled from "styled-components";
 import {useSelector} from "react-redux";
+import { CSSTransition } from 'react-transition-group';
+
 import {setShowCart, settingsSelector} from "../../features/settings/settingsSlice";
-import {useAppDispatch} from "../../app/hooks";
-import theme from "../../styles/theme";
-import {CardB, ClientOnlyPortal} from "../index";
-import Logo from "../Logo";
-import Button from "../Button";
 import {cartSelector} from '../../features/cart/cartSlice'
 import {setItems} from '../../features/cart/cartSlice'
+import {useAppDispatch} from "../../app/hooks";
 import {getCartFromLS} from "../../utils/getCartFromLS";
+import {CardB, ClientOnlyPortal} from "../index";
+import theme from "../../styles/theme";
+import Logo from "../Logo";
+import Button from "../Button";
 
-const Wrapper = styled.div<{ isActive: boolean }>`
+const Wrapper = styled.div`
   position: fixed;
   z-index: 110;
   top: 0;
@@ -19,10 +21,6 @@ const Wrapper = styled.div<{ isActive: boolean }>`
 
   width: 100%;
   height: 100vh;
-
-  pointer-events: none;
-
-  ${(props) => props.isActive && `pointer-events: all;`}
 `;
 const Footer = styled.div`
   position: relative;
@@ -36,7 +34,7 @@ const Footer = styled.div`
   background: ${theme.colors.darkBlue};
   border-radius: 24px;
 `;
-const Cart = styled.div<{ isActive: boolean }>`
+const Cart = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -59,11 +57,25 @@ const Cart = styled.div<{ isActive: boolean }>`
   transition: 0.7s transform;
   transition-timing-function: cubic-bezier(0.85, 0.01, 0.2, 0.99);
 
+  .cart-modal-enter & {
+    transform: translateX(150%);
+  }
+  .cart-modal-enter-active & {
+    transform: translateX(0%);
+  }
+  .cart-modal-enter-done & {
+    transform: translateX(0%);
+  }
+  .cart-modal-exit & {
+    transform: translateX(0%);
+  }
+  .cart-modal-exit-active & {
+    transform: translateX(150%);
+  }
+
   @media (max-width: ${theme.media.mob}) {
     max-height: calc(100% - 110px);
   }
-
-  ${(props) => props.isActive && `transform: translateX(0%);`}
 `;
 const List = styled.ul`
   overflow-y: scroll;
@@ -104,7 +116,7 @@ const LogoEmptyWrapper = styled.div`
   width: max-content;
   padding: 104px 0;
 `;
-const Overflow = styled.div<{ isActive: boolean }>`
+const Overflow = styled.div`
   width: 100%;
   height: 100%;
 
@@ -113,7 +125,18 @@ const Overflow = styled.div<{ isActive: boolean }>`
   transition: 0.7s background-color;
   transition-timing-function: cubic-bezier(0.85, 0.01, 0.2, 0.99);
 
-  ${(props) => props.isActive && `background: rgba(0, 0, 0, 0.9);`}
+  .cart-modal-enter-active & {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  .cart-modal-enter-done & {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  .cart-modal-exit & {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  .cart-modal-exit-active & {
+    background: rgba(0, 0, 0, 0);
+  }
 `;
 const Total = styled.div`
   display: flex;
@@ -155,7 +178,7 @@ interface CartModalProps {
   selector: string
 }
 
-export const CartModal: React.FC<CartModalProps> = ({selector}) => {
+const CartModal: React.FC<CartModalProps> = ({selector}) => {
   const {items, totalPrice, totalCount} = useSelector(cartSelector);
   const {showCart} = useSelector(settingsSelector);
   const dispatch = useAppDispatch();
@@ -184,9 +207,10 @@ export const CartModal: React.FC<CartModalProps> = ({selector}) => {
 
   return (
     <ClientOnlyPortal selector={selector}>
-      <Wrapper className={"js-cart-wrapper"} isActive={showCart}>
-        <Overflow isActive={showCart} onClick={onClickShowCartButton}/>
-        <Cart isActive={showCart}>
+      <CSSTransition in={showCart} classNames={'cart-modal'} timeout={700} unmountOnExit>
+        <Wrapper className={"js-cart-wrapper"}>
+        <Overflow onClick={onClickShowCartButton}/>
+        <Cart>
           <List>
             {totalCount > 0 ? (
               <>
@@ -236,6 +260,9 @@ export const CartModal: React.FC<CartModalProps> = ({selector}) => {
           </Footer>
         </Cart>
       </Wrapper>
+      </CSSTransition>
     </ClientOnlyPortal>
   )
 }
+
+export default CartModal;

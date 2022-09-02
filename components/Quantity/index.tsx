@@ -1,12 +1,15 @@
 import React from 'react';
 import styled from "styled-components";
+
 import theme from "../../styles/theme";
+import PlusIco from '../../public/svg/plus.svg'
+import MinusIco from '../../public/svg/minus.svg'
 
 const QuantityEl = styled.div`
   display: flex;
   align-items: center;
 `
-const Button = styled.div<{ disabled?: boolean }>`
+const Button = styled.button<{ disabled?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,20 +18,28 @@ const Button = styled.div<{ disabled?: boolean }>`
   padding: 1px 0 0 0;
 
   font-size: 10px;
-  color: ${theme.colors.green};
 
   cursor: pointer;
   border-radius: 50%;
   border: 1px solid ${theme.colors.green};
 
   &:hover {
-    color: #FFFFFF;
-
     background: ${theme.colors.green};
+
+    svg {
+      fill: #FFFFFF;
+    }
   }
 
-  ${props => props.disabled && 'color: #FFFFFF;' +
-          'pointer-events: none; opacity: .3; border: 1px solid #FFFFFF;'}
+  ${props => props.disabled && `
+    pointer-events: none; 
+    opacity: .3; 
+    border: 1px solid #FFFFFF;
+    
+    svg {
+      fill: #FFFFFF;
+    }
+  `}
 `
 const Value = styled.div`
   width: 30px;
@@ -37,6 +48,16 @@ const Value = styled.div`
 
   font-size: 20px;
   text-align: center;
+`
+const PlusIcon = styled.svg`
+  width: 13px;
+  height: 13px;
+  fill: ${theme.colors.green};
+`
+const MinusIcon = styled.svg`
+  width: 13px;
+  height: 13px;
+  fill: ${theme.colors.green};
 `
 
 type QuantityProps = {
@@ -49,11 +70,11 @@ export const Quantity: React.FC<QuantityProps> = ({count, onClickPlus, onClickMi
   return (
     <QuantityEl>
       <Button onClick={onClickMinus} disabled={count === 1}>
-        <i className="fal fa-minus"></i>
+        <MinusIcon as={MinusIco}/>
       </Button>
       <Value>{count}</Value>
       <Button onClick={onClickPlus}>
-        <i className="fal fa-plus"></i>
+        <PlusIcon as={PlusIco}/>
       </Button>
     </QuantityEl>
   )

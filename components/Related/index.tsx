@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import {CardCatalog} from "../";
 import theme from "../../styles/theme";
 import {ResponseProduct} from "../../utils/api/types";
+import dynamic from "next/dynamic";
 
 const RelatedEl = styled.div`
   display: grid;
@@ -23,11 +23,13 @@ type NewGoodsProps = {
   items: ResponseProduct[]
 }
 
+const DynamicCardCatalog = dynamic(() => import(/*webpackChunkName: "CardCatalog_DYNAMIC_IMPORT"*/'../CardCatalog'))
+
 export const Related: React.FC<NewGoodsProps> = ({items}) => {
   return (
     <RelatedEl>
       {items.map((goods) => (
-        <CardCatalog key={goods.id} {...goods} />
+        <DynamicCardCatalog key={goods.id} {...goods} />
       ))}
     </RelatedEl>
   );

@@ -69,7 +69,7 @@ const Text = styled.span`
 type LogoProps = {
   text: string;
   title: string;
-  icon: string;
+  icon: JSX.Element;
   iconColor?: string;
 }
 
@@ -77,7 +77,7 @@ const ProfileInfoCard: React.FC<LogoProps> = ({text, title, icon, iconColor = '#
   return (
     <InfoCard>
       <Icon iconColor={iconColor}>
-        <i className={icon}></i>
+        {icon}
       </Icon>
       <Title>
         {title}

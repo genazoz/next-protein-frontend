@@ -14,7 +14,7 @@ const GlobalStyles = createGlobalStyle`
 
   html {
     font-size: 16px;
-    font-family: ${theme.fonts.bebasB};
+    font-family: ${theme.fonts.bebasB}, Impact, Serif;
     color: white;
     background: #14132d;
   }

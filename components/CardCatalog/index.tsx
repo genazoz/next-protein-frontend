@@ -6,6 +6,8 @@ import Link from "next/link";
 import {useDispatch, useSelector} from 'react-redux';
 import {addItem, cartSelector} from '../../features/cart/cartSlice'
 import {ResponseProduct} from "../../utils/api/types";
+import Image from "next/future/image";
+import Indicator, {IndicatorSide} from "../Indicator";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -32,7 +34,7 @@ const Wrapper = styled.div`
     }
   }
 }`;
-const Card = styled.div`
+const Card = styled.div<{ isActive: boolean }>`
   position: relative;
 
   overflow: hidden;
@@ -41,7 +43,6 @@ const Card = styled.div`
   padding: 63% 0;
 
   border-radius: 10px;
-  //background: linear-gradient(-45deg, #1e1d3a, #282749);
   border: 1px solid transparent;
   background: linear-gradient(-45deg, #1e1d3a, #282749);
 
@@ -68,7 +69,23 @@ const Card = styled.div`
       opacity: 1;
     }
   }
+  &::after {
+    content: "";
 
+    position: absolute;
+    z-index: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(7, 59, 49, .4);
+
+    transition: 0.3s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  }
 
   @media (max-width: ${theme.media.mob}) {
     height: 220px;
@@ -84,28 +101,39 @@ const Card = styled.div`
   a {
     font-family: ${theme.fonts.bebasB};
   }
+
+  ${(props) => props.isActive && `
+      border-color: ${theme.colors.green};
+      
+      &::after{
+        opacity: 1;
+      }
+    `
+  }
 `;
-const Background = styled.div`
+const ImgWrapper = styled.span`
   position: absolute;
-  top: -43px;
-  left: 0px;
+  top: 8px;
+  left: 0;
+  z-index: 1;
 
   width: 145%;
-  height: 145%;
+  height: auto;
   margin: auto;
 
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
   pointer-events: none;
 
   transition: transform 0.4s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+`
+const Img = styled.img`
+  width: 100%;
+  height: auto;
 `;
 const AddToCartButton = styled.button<{ isActive: boolean }>`
   position: absolute;
   top: 20px;
   right: 20px;
-  z-index: 1;
+  z-index: 2;
 
   display: flex;
   align-items: center;
@@ -125,39 +153,24 @@ const AddToCartButton = styled.button<{ isActive: boolean }>`
   transition: 0.2s all;
 
   &:hover {
-    color: ${theme.colors.darkBlue};
+    svg {
+      fill: ${theme.colors.darkBlue};
+    }
 
     background: ${theme.colors.green};
   }
 
-  .fa-shopping-bag {
-    position: relative;
-
-    opacity: 1;
-
-    transition: .6s font-size cubic-bezier(0.85, 0.01, 0.2, 0.99);
-  }
-
-  span {
+  svg {
     position: absolute;
 
-    margin-top: 4px;
+    fill: #FFFFFF;
+    opacity: 1;
 
-    font-size: 0px;
-
-    transition: .6s font-size cubic-bezier(0.85, 0.01, 0.2, 0.99);
-    transition-delay: .1s;
+    transition: 0.2s all;
   }
 
   &:active {
     transform: scale(1.1)
-  }
-  
-  @media (max-width: ${theme.media.mobSm}) {
-    right: unset;
-    left: 20px;
-
-    margin: 0;
   }
 
   ${(props) => {
@@ -166,23 +179,23 @@ const AddToCartButton = styled.button<{ isActive: boolean }>`
         margin-left: 15px;
         padding: 20px;
         
-        color: ${theme.colors.green};
-        
         border-radius: 100px;
-        background: #FFFFFF;
+        background: ${theme.colors.green};
         transition: .2s all;
         
         &:hover {
           color: ${theme.colors.green};
+          
+          svg {
+            fill: ${theme.colors.darkBlue};
+          }
         
-          background: #FFFFFF;
+          background: ${theme.colors.green};
         }
-        .fa-shopping-bag {
+        svg {
           position: absolute;
           
-          margin-top: -1px;
-          
-          font-size: 18px;
+            fill: ${theme.colors.darkBlue};
         }
         span {
           font-size: 10px;
@@ -245,8 +258,17 @@ const LinkElement = styled.a`
   width: 100%;
   height: 100%;
 `;
+const IndicatorWrapper = styled.div`
+  position: absolute;
+  left: -25px;
+  top: 13px;
+  
+  @media (max-width: ${theme.media.tabSm}) and (min-width: ${theme.media.mobSm}) {
+    left: -29px;
+  }
+`
 
-export const CardCatalog: React.FC<ResponseProduct> = ({id, imageUrl, title, price, category}) => {
+const CardCatalog: React.FC<ResponseProduct> = ({id, imageUrl, title, price, category}) => {
   const {items} = useSelector(cartSelector);
   const itemInCart = items.find((item) => item.id === id);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -317,7 +339,7 @@ export const CardCatalog: React.FC<ResponseProduct> = ({id, imageUrl, title, pri
       onMouseEnter={() => handleMouseEnter()}
       onMouseLeave={() => handleMouseLeave()}
     >
-      <Card className={"card"} ref={cardRef}>
+      <Card className={"card"} isActive={itemInCart ? true : false} ref={cardRef}>
         <Link href={`/card/${id}`}>
           <LinkElement></LinkElement>
         </Link>
@@ -325,17 +347,32 @@ export const CardCatalog: React.FC<ResponseProduct> = ({id, imageUrl, title, pri
           onClick={() => onClickAddToCartButton()}
           isActive={itemInCart ? true : false}
         >
-          <span>{itemInCart && itemInCart.count}</span>
-          <i className="fal fa-shopping-bag"></i>
+          {itemInCart &&
+            <IndicatorWrapper>
+              <Indicator side={IndicatorSide.TORIGHT} count={itemInCart.count}/>
+            </IndicatorWrapper>
+          }
+          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" stroke={'none'} data-name="Layer 1"
+               viewBox="0 0 200 200">
+            <path
+              d="M75 71.09v-10c0-14.28 11.15-25.93 25-25.93s25 11.65 25 25.93v10h17.28A3.13 3.13 0 0 1 145.4 74l5.94 87.5a3.14 3.14 0 0 1-2.91 3.33H51.78a3.12 3.12 0 0 1-3.12-3.12v-.21L54.6 74a3.13 3.13 0 0 1 3.12-2.92Zm9.38 0h31.25v-10c0-9.19-7-16.56-15.63-16.56S84.38 51.9 84.38 61.09Zm-25.91 84.38h83.06l-5.08-75H63.56Z"
+              className="color000 svgShape"></path>
+          </svg>
         </AddToCartButton>
-        <Background
-          ref={bgRef}
-          className={"card-bg"}
-          style={{backgroundImage: `url('/img/${imageUrl}.png`}}
-        ></Background>
+        <ImgWrapper className={"card-bg"} ref={bgRef}>
+          <Img
+            as={Image}
+            src={`/img/${imageUrl}.png`}
+            alt={'goods'}
+            width={1200}
+            height={1200}
+          ></Img>
+        </ImgWrapper>
         <Name>{title}</Name>
         <Price>{price}</Price>
       </Card>
     </Wrapper>
   );
 }
+
+export default CardCatalog;

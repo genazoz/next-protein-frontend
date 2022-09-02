@@ -10,6 +10,10 @@ import {useAppDispatch} from "../app/hooks";
 import Button from "../components/Button";
 import React, {useMemo} from "react";
 import ProfileInfoCard from "../components/ProfileInfoCard";
+import ListFormatIco from '../public/svg/list-format.svg'
+import CurrencyRubIco from '../public/svg/currency-rub.svg'
+import BoxIco from '../public/svg/box.svg'
+import CalendarIco from '../public/svg/calendar.svg'
 
 const Content = styled.div`
   display: flex;
@@ -241,6 +245,34 @@ const EmptyTable = styled.span`
     opacity: 1;
   }
 `
+const ListFormatIcon = styled.svg`
+  width: 15px;
+  height: 15px;
+
+  stroke: ${theme.colors.darkBlue};
+  fill: ${theme.colors.darkBlue};
+`
+const CurrencyRubIcon = styled.svg`
+  width: 21px;
+  height: 21px;
+  
+  line, path {
+    stroke:${theme.colors.darkBlue};
+  }
+`
+const BoxIcon = styled.svg`
+  width: 20.5px;
+  height: 20.5px;
+
+  fill: ${theme.colors.darkBlue};
+  stroke: ${theme.colors.darkBlue};
+`
+const CalendarIcon = styled.svg`
+  width: 17px;
+  height: 17px;
+
+  fill: ${theme.colors.darkBlue};
+`
 
 const Profile: NextPage<{ userData: ResponseUser, orders: OrderItem[] }> = ({userData, orders}) => {
   const dispatch = useAppDispatch();
@@ -277,7 +309,7 @@ const Profile: NextPage<{ userData: ResponseUser, orders: OrderItem[] }> = ({use
           </UserInfoWrapper>
           <Buttons>
             <Button type={'link'} href={'/catalog'} theme={'dark'} text={"К покупкам"} onClick={onClickExitUser}/>
-            <Button theme={'green'} text={"Выйти"} icon="fal fa-sign-out" onClick={onClickExitUser}/>
+            <Button theme={'green'} text={"Выйти"}  onClick={onClickExitUser}/>
           </Buttons>
         </UserPanel>
         <Title>
@@ -286,19 +318,19 @@ const Profile: NextPage<{ userData: ResponseUser, orders: OrderItem[] }> = ({use
         <InfoCards>
           <ProfileInfoCard text={`${orders.length}`}
                            title={'Количество заказов'}
-                           icon={'far fa-list'}
+                           icon={<ListFormatIcon as={ListFormatIco}/>}
                            iconColor={'#b4e4c8'}/>
           <ProfileInfoCard text={`${totalPrice} Р`}
                            title={'Сумма всех заказов'}
-                           icon={'far fa-ruble-sign'}
+                           icon={<CurrencyRubIcon as={CurrencyRubIco}/>}
                            iconColor={'#FFD0B1'}/>
           <ProfileInfoCard text={`${countOfPaidGoods}`}
                            title={'Количество купленных товаров'}
-                           icon={'far fa-box-check'}
+                           icon={<BoxIcon as={BoxIco}/>}
                            iconColor={'#d2b1fe'}/>
           <ProfileInfoCard text={`${registrationDate}`}
                            title={'Дата регистрации на сайте'}
-                           icon={'far fa-calendar'}
+                           icon={<CalendarIcon as={CalendarIco}/>}
                            iconColor={'#b1dafd'}/>
         </InfoCards>
       </Header>

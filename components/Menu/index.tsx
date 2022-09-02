@@ -1,16 +1,15 @@
 import React from "react";
-
-import styled from "styled-components";
-import theme from "../../styles/theme";
 import Link from "next/link";
-import {gsap} from "gsap";
 import {useSelector} from "react-redux";
+import styled from "styled-components";
+import { CSSTransition } from 'react-transition-group';
+
+import theme from "../../styles/theme";
 import {settingsSelector} from "../../features/settings/settingsSlice";
 import {useAppDispatch} from "../../app/hooks";
 import {setMenuOpened} from "../../features/settings/settingsSlice";
-import useWindowDimensions from '../../@hooks/useWindowDimensions';
 
-const MenuEl = styled.div<{ isShow: boolean }>`
+const MenuEl = styled.div`
   position: fixed;
   z-index: -1;
   top: 0;
@@ -32,7 +31,12 @@ const MenuEl = styled.div<{ isShow: boolean }>`
     display: none;
   }
 
-  ${(props) => props.isShow && `pointer-events: all; opacity: 1`}
+  &.menu-enter-active {
+    pointer-events: all; 
+  }
+  &.menu-enter-done {
+    pointer-events: all;
+  }
 `;
 const Overlay = styled.svg`
   grid-area: 1 / 1 / 2 / 2;
@@ -41,45 +45,52 @@ const Overlay = styled.svg`
   pointer-events: none;
   width: 100%;
   height: 100%;
-`;
-const Strips = styled.ul`
-  position: absolute;
-  z-index: -1;
 
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-
-  transform: skewX(-45deg);
-  display: none;
-`;
-const Strip = styled.li<{ isShow: boolean }>`
-  display: flex;
-  width: 3px;
-  margin: auto 0 auto 13vh;
-
-  background: ${theme.colors.darkBlue};
-
-  transition: 0.8s height cubic-bezier(0.85, 0.01, 0.2, 0.99);
-  transition-delay: 0.1s;
-
-  &:first-child {
-    margin-left: 1vh;
+  path {
+    .menu-enter & {
+      animation: show-overlay 1.1s forwards;
+    }
+    .menu-enter-done & {
+      animation: show-overlay 1.1s forwards;
+    }
+    .menu-exit-active & {
+      animation: hide-overlay 1.05s forwards;
+    }
   }
 
-  ${(props) =>
-  props.isShow
-    ? `transition-delay: .7s; height: 100%;`
-    : `transition: .6s height cubic-bezier(0.85, 0.01, 0.2, 0.99);height: 0%;`}
+  @keyframes show-overlay {
+    0% {
+      animation-timing-function: cubic-bezier(1, 0, 1, 1.1);
+      d: path("M 0 100 V 100 Q 50 100 100 100 V 100 z");
+    }
+    73% {
+      animation-timing-function: cubic-bezier(.15, .15, .15, 1.1);
+      d: path("M 0 100 V 50 Q 50 0 100 50 V 100 z");
+    }
+    100% {
+      d: path("M 0 100 V 0 Q 50 0 100 0 V 100 z");
+    }
+  }
+  @keyframes hide-overlay {
+    0% {
+      animation-timing-function: cubic-bezier(1, 0, 1, 1.1);
+      d: path("M 0 100 V 0 Q 50 0 100 0 V 100 z");
+    }
+    73% {
+      animation-timing-function: cubic-bezier(.15, .15, .15, 1.1);
+      d: path("M 0 100 V 50 Q 50 100 100 50 V 100 z");
+    }
+    100% {
+      d: path("M 0 100 V 100 Q 50 100 100 100 V 100 z");
+    }
+  }
 `;
 const List = styled.ul`
   width: 82%;
   height: auto;
   margin: auto;
 `;
-const ListItem = styled.li<{ isShow: boolean }>`
+const ListItem = styled.li`
   position: relative;
   z-index: 111;
 
@@ -100,52 +111,67 @@ const ListItem = styled.li<{ isShow: boolean }>`
   transform: skew(-10deg) rotate(-10deg);
 
   transition: 0.5s height cubic-bezier(0.85, 0.01, 0.2, 0.99),
-  0.5s box-shadow cubic-bezier(0.85, 0.01, 0.2, 0.99),
-  .4s opacity;
+    0.5s box-shadow cubic-bezier(0.85, 0.01, 0.2, 0.99),
+    .4s opacity;
   transition-delay: 0s;
 
-  ${(props) =>
-  props.isShow &&
-  `height: 100px;
-     padding: 3px 30px 0px 30px;
+  .menu-enter-active & {
+    height: 100px;
+    padding: 3px 30px 0px 30px;
+
+    opacity: 1;
+    box-shadow: 0 0 0 5px #1abc9c, 0 0 0 10px white;
+
+    transition: 0.6s height cubic-bezier(0.85, 0.01, 0.2, 0.99), 0.6s padding cubic-bezier(0.85, 0.01, 0.2, 0.99), 1.4s box-shadow cubic-bezier(0.85, 0.01, 0.2, 0.99);
+    transition-delay: .7s;
+
+    @media (max-width: ${theme.media.tabSm}) {
+      height: 70px;
+    }
+  }
+  .menu-enter-done & {
+    height: 100px;
+    padding: 3px 30px 0px 30px;
+
+    opacity: 1;
+    box-shadow: 0 0 0 5px #1abc9c, 0 0 0 10px white;
+
+    transition: 0.6s height cubic-bezier(0.85, 0.01, 0.2, 0.99), 0.6s padding cubic-bezier(0.85, 0.01, 0.2, 0.99), 1.4s box-shadow cubic-bezier(0.85, 0.01, 0.2, 0.99);
+    transition-delay: .7s;
+    
+    @media (max-width: ${theme.media.tabSm}) {
+      height: 70px;
+    }
+  }
   
-     opacity: 1;
-     box-shadow: 0 0 0 5px #1abc9c, 0 0 0 10px white;
-     
-     transition: 0.6s height cubic-bezier(0.85, 0.01, 0.2, 0.99), 0.6s padding cubic-bezier(0.85, 0.01, 0.2, 0.99), 1.4s box-shadow cubic-bezier(0.85, 0.01, 0.2, 0.99);
-     transition-delay: .7s;
-      @media (max-width: ${theme.media.tabSm}) {
-        height: 70px;
-      }
-    `};
-  &:nth-child(1) {
-    a {
+  &:nth-child(1) a {
       transition: 0.5s all cubic-bezier(0.85, 0.01, 0.2, 0.99);
       transition-delay: 0.25s;
 
-      ${(props) =>
-  props.isShow &&
-  `transition: .6s transform cubic-bezier(.85,.01,.2,.99); transition-delay: .7s;`}
-    }
+      .menu-enter-active & {
+        transition: .6s transform cubic-bezier(.85,.01,.2,.99);
+        transition-delay: .8s;
+      }
+      .menu-enter-done & {
+        transition: .6s transform cubic-bezier(.85,.01,.2,.99);
+        transition-delay: .8s;
+      }
   }
 
   &:nth-child(2) a {
-    ${(props) =>
-  props.isShow
-    ? `transition: .8s transform cubic-bezier(.85,.01,.2,.99);
-    transition-delay: .7s;`
-    : `transition: 0.7s all cubic-bezier(0.85, 0.01, 0.2, 0.99);
-    transition-delay: 0.25s;`}
+    transition: 0.7s all cubic-bezier(0.85, 0.01, 0.2, 0.99);
+    transition-delay: 0.25s;
+
+    .menu-enter-active & {
+      transition: .8s transform cubic-bezier(.85,.01,.2,.99);
+      transition-delay: .8s;
+    }
+    .menu-enter-done & {
+      transition: .8s transform cubic-bezier(.85,.01,.2,.99);
+      transition-delay: .8s;
+    }
   }
 
-  &:nth-child(3) a {
-    ${(props) =>
-  props.isShow
-    ? `transition: 1s transform cubic-bezier(.85,.01,.2,.99);
-    transition-delay: .7s;`
-    : `transition: 0.9s all cubic-bezier(0.85, 0.01, 0.2, 0.99);
-      transition-delay: 0.25s;`}
-  }
 
   a {
     display: flex;
@@ -158,10 +184,18 @@ const ListItem = styled.li<{ isShow: boolean }>`
       font-size: 50px;
     }
 
-    ${(props) =>
-  props.isShow
-    ? `transform: translateY(0%);`
-    : `transform: translateY(150%);`}
+    .menu-enter & {
+      transform: translateY(0%);
+    }
+    .menu-enter-done & {
+      transform: translateY(0%);
+    }
+    .menu-exit-active & {
+      transform: translateY(150%);
+    }
+    .menu-exit-done & {
+      transform: translateY(150%);
+    }
   }
 
   &:after {
@@ -200,47 +234,24 @@ const linksArray = [
   {link: "catalog", text: "Каталог"},
 ];
 
-export const Menu = () => {
+const Menu = () => {
   const {menuOpened} = useSelector(settingsSelector);
   const dispatch = useAppDispatch();
-  const { width } = useWindowDimensions();
 
   const onClickLink = () => {
     dispatch(setMenuOpened(false));
-    closeMenu();
-  };
-
-  const closeMenu = () => {
-    const overlayPath = document.querySelector(".js-overlay-path");
-
-    gsap
-      .timeline({})
-      // now reveal
-      .set(overlayPath, {
-        attr: {d: "M 0 100 V 0 Q 50 0 100 0 V 100 z"},
-      })
-      .to(overlayPath, {
-        duration: 0.9,
-        ease: "power4.in",
-        attr: {d: "M 0 100 V 50 Q 50 100 100 50 V 100 z"},
-      })
-      .to(overlayPath, {
-        duration: 0.3,
-        ease: "power2",
-        attr: {d: "M 0 100 V 100 Q 50 100 100 100 V 100 z"},
-      });
   };
 
   return (
-    <MenuEl isShow={menuOpened}>
-      {/*{width && width > 1200 && (<Balls isShow={menuOpened}/>)}*/}
+    <CSSTransition in={menuOpened} classNames={'menu'} timeout={1100} unmountOnExit>
+      <MenuEl>
       <Overlay
         className="overlay"
         width="100%"
         height="100%"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        fill={"#ccc"}
+        fill={"#1aa085"}
       >
         <path
           className="js-overlay-path"
@@ -248,15 +259,9 @@ export const Menu = () => {
           d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
         />
       </Overlay>
-      <Strips>
-        <Strip isShow={menuOpened}/>
-        <Strip isShow={menuOpened}/>
-        <Strip isShow={menuOpened}/>
-        <Strip isShow={menuOpened}/>
-      </Strips>
       <List>
         {linksArray.map((item, index) => (
-          <ListItem key={index} isShow={menuOpened}>
+          <ListItem key={index}>
             <span onClick={onClickLink}>
               <Link href={`/${item.link}`}>
                   {item.text}
@@ -266,5 +271,8 @@ export const Menu = () => {
         ))}
       </List>
     </MenuEl>
+    </CSSTransition>
   );
 }
+
+export default Menu;

@@ -6,6 +6,8 @@ import {useAppDispatch} from "../../app/hooks";
 import {minusItem, addItem, removeItem, CartProduct} from '../../features/cart/cartSlice'
 import {Quantity} from '../'
 import Link from "next/link";
+import Image from "next/future/image";
+import CloseIco from '../../public/svg/close.svg'
 
 const Card = styled.div`
   position: relative;
@@ -49,8 +51,9 @@ const ImageWrapper = styled.div`
   height: 250px;
   
   cursor: pointer;
+  pointer-events: none;
 `;
-const Image = styled.img`
+const Img = styled.img`
   z-index: 1;
 
   width: 100%;
@@ -103,6 +106,12 @@ const Elements = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto`
+const CloseIcon = styled.svg`
+  width: 16px;
+  height: 16px;
+  
+  fill: #FFFFFF;
+`
 
 export const CardBasket: React.FC<CartProduct> = ({id, imageUrl, title, price, count, category}) => {
   const dispatch = useAppDispatch()
@@ -122,7 +131,7 @@ export const CardBasket: React.FC<CartProduct> = ({id, imageUrl, title, price, c
     <Card>
       <Link href={`/card/${id}`}>
         <ImageWrapper>
-          <Image width="300" height="300" src={`/img/${imageUrl}.png`} alt=""/>
+          <Img as={Image} width="300" height="300" src={`/img/${imageUrl}.png`} alt=""/>
         </ImageWrapper>
       </Link>
       <Elements>
@@ -131,7 +140,7 @@ export const CardBasket: React.FC<CartProduct> = ({id, imageUrl, title, price, c
         <Remove onClick={() => {
           onClickRemove();
         }}>
-          <i className={'fal fa-times'}></i>
+          <CloseIcon as={CloseIco}/>
         </Remove>
       </Elements>
     </Card>

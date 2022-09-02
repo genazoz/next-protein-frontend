@@ -6,11 +6,21 @@ export interface ResponseProduct {
   price: number;
 };
 
+export interface ResponseOrderProduct {
+  id: number;
+  title: string;
+  imageUrl: string;
+  category: number;
+  prodId: number;
+  price: number;
+};
+
 export interface CreateOrderProductDto {
   title: string;
   imageUrl: string;
   category: number;
   price: number;
+  prodId: number;
   orderId: number;
 };
 
@@ -44,17 +54,20 @@ export enum OrderStatus {
   PROCESS = 'В обработке',
   SUCCESS = 'Оплачено',
 }
+
 export type CreateOrderDto = {
   status: OrderStatus;
   price: number;
   count: number;
 };
+
 export type ResponseOrder = {
   id: number,
   status: OrderStatus;
   price: number;
   count: number;
 };
+
 export type FindOrderByUserDto = {
   userId: number;
 };

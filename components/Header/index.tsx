@@ -1,19 +1,23 @@
 import React from "react";
+import {useRouter} from 'next/router'
+import Link from "next/link";
 import styled from "styled-components";
 import {useSelector} from 'react-redux'
+import dynamic from "next/dynamic";
+import {setCookie} from "nookies";
+
 import {cartSelector} from "../../features/cart/cartSlice";
-import theme from "../../styles/theme";
-import {AuthModal, CartModal, Menu} from "../";
-import {gsap} from "gsap";
-import Logo from "../Logo";
 import {setMenuOpened, setShowAuthModal, setShowCart, settingsSelector} from "../../features/settings/settingsSlice";
+import theme from "../../styles/theme";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {BackButton} from "../../components/index";
-import {useRouter} from 'next/router'
 import useWindowDimensions from "../../@hooks/useWindowDimensions";
 import {selectUserData, setUserData} from "../../features/user/userSlice";
-import Link from "next/link";
-import {setCookie} from "nookies";
+import Logo from "../Logo";
+import Indicator from "../Indicator";
+import SignOutIco from '../../public/svg/signout.svg'
+import UserIco from '../../public/svg/user.svg'
+import CartIco from '../../public/svg/cart.svg'
 
 const HeaderEl = styled.header<{ isHidden: boolean }>`
   position: fixed;
@@ -246,17 +250,20 @@ const Side = styled.div`
   display: flex;
   align-items: center;
   gap: 35px;
-  padding: 0px 28px 0 12px;
+  padding: 0px 27px 0 12px;
 
   background: ${theme.colors.darkBlue};
   border-radius: 20px;
 
   @media (max-width: ${theme.media.tabSm}) {
-    gap: 25px;
+    gap: 30px;
     padding: 0;
 
     background: transparent;
     border-radius: 0;
+  }
+  @media (max-width: ${theme.media.mobSm}) {
+    gap: 25px;
   }
 `;
 const LogoWrapper = styled.div`
@@ -286,49 +293,20 @@ const CartButton = styled.button`
     color: #ffffff;
     background: transparent;
 
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+
     i {
       font-size: 20px;
     }
   }
-`;
-const CartIndicator = styled.span`
-  position: absolute;
-  right: -8px;
-  top: 17px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 19px;
-  height: 14px;
-  padding-top: 1px;
-
-  font-family: ${theme.fonts.bebasB};
-  font-size: 11px;
-  color: ${theme.colors.darkBlue};
-
-  cursor: pointer;
-  background: ${theme.colors.green};
-  border-radius: 3px;
-
-  &::before {
-    content: '';
-
-    position: absolute;
-    left: -6px;
-    top: 0;
-    bottom: 0;
-
-    width: 0;
-    height: 0;
-    margin: auto;
-
-    border: 3px solid transparent;
-    border-right-color: ${theme.colors.green};
-  }
-
-  @media (max-width: ${theme.media.tab}) {
-    padding-top: 1px;
+  @media (max-width: ${theme.media.mobSm}) {
+    svg {
+      width: 25px;
+      height: 25px;
+    }
   }
 `;
 const UserButton = styled.button`
@@ -402,6 +380,19 @@ const Avatar = styled.div`
   border-radius: 50%;
   border: 1px solid ${theme.colors.green};
   background: rgba(27, 188, 155, .2);
+
+  @media (max-width: ${theme.media.tabSm}) {
+    width: 34px;
+    height: 34px;
+
+    font-size: 16px;
+  }
+  @media (max-width: ${theme.media.mobSm}) {
+    width: 27px;
+    height: 27px;
+
+    font-size: 14px;
+  }
 `
 const Exit = styled.button`
   display: flex;
@@ -428,10 +419,43 @@ const Exit = styled.button`
   //  margin: 0 0 0 3px;
   //}
 `
+const IndicatorWrapper = styled.div`
+  position: absolute;
+  right: -9px;
+  top: 17px;
 
-export const Header: React.FC = () => {
+  @media (max-width: ${theme.media.tabSm}) and (min-width: ${theme.media.mobSm}) {
+    right: -12px;
+  }
+`
+const SignOutIcon = styled.svg`
+  width: 15px;
+  height: 15px;
+
+  fill: #AAAAAA;
+
+  transform: rotate(180deg) translateY(-1px);
+`
+const UserIcon = styled.svg`
+  width: 17px;
+  height: 17px;
+
+  fill: #FFFFFF;
+`
+const CartIcon = styled.svg`
+  width: 25.5px;
+  height: 25.5px;
+
+  fill: #FFFFFF;
+`
+
+const DynamicMenu = dynamic(() => import(/*webpackChunkName: "Menu_DYNAMIC_IMPORT"*/'../Menu'))
+const DynamicCartModal = dynamic(() => import(/*webpackChunkName: "CartModal_DYNAMIC_IMPORT"*/'../CartModal'))
+const DynamicAuthModal = dynamic(() => import(/*webpackChunkName: "AuthModal_DYNAMIC_IMPORT"*/'../AuthModal'))
+
+const Header: React.FC = () => {
   const {totalCount} = useSelector(cartSelector);
-  const {menuOpened, previewSubmitHovered} = useSelector(settingsSelector);
+  const {menuOpened, previewSubmitHovered, showCart, showAuthModal} = useSelector(settingsSelector);
   const dispatch = useAppDispatch();
   const router = useRouter()
   const {width} = useWindowDimensions();
@@ -446,7 +470,6 @@ export const Header: React.FC = () => {
   }
   const onClickMenuButton = () => {
     dispatch(setMenuOpened(!menuOpened));
-    menuOpened ? closeMenu() : openMenu();
   };
   const onClickCartButton = () => {
     dispatch(setShowCart(true));
@@ -454,69 +477,9 @@ export const Header: React.FC = () => {
   const onClickUserButton = () => {
     dispatch(setShowAuthModal(true));
   };
-  let isAnimating = false;
-
-  const openMenu = () => {
-    if (isAnimating) return;
-
-    const overlayPath = document.querySelector(".js-overlay-path");
-    isAnimating = true;
-
-    gsap
-      .timeline({
-        onComplete: (): void => {
-          isAnimating = false
-        },
-      })
-      .set(overlayPath, {
-        attr: {d: "M 0 100 V 100 Q 50 100 100 100 V 100 z"},
-      })
-      .to(
-        overlayPath,
-        {
-          duration: 0.8,
-          ease: "power4.in",
-          attr: {d: "M 0 100 V 50 Q 50 0 100 50 V 100 z"},
-        },
-        0
-      )
-      .to(overlayPath, {
-        duration: 0.3,
-        ease: "power2",
-        attr: {d: "M 0 100 V 0 Q 50 0 100 0 V 100 z"},
-        onComplete: () => {
-        },
-      });
-  };
-  const closeMenu = () => {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    const overlayPath = document.querySelector(".js-overlay-path");
-
-    gsap
-      .timeline({
-        onComplete: (): void => {
-          isAnimating = false
-        },
-      })
-      // now reveal
-      .set(overlayPath, {
-        attr: {d: "M 0 100 V 0 Q 50 0 100 0 V 100 z"},
-      })
-      .to(overlayPath, {
-        duration: 0.9,
-        ease: "power4.in",
-        attr: {d: "M 0 100 V 50 Q 50 100 100 50 V 100 z"},
-      })
-      .to(overlayPath, {
-        duration: 0.3,
-        ease: "power2",
-        attr: {d: "M 0 100 V 100 Q 50 100 100 100 V 100 z"},
-      });
-  };
 
   return (
+
     <HeaderEl className={"js-header"} isHidden={previewSubmitHovered}>
       <MenuButtonWrapper onClick={onClickMenuButton}>
         <MenuButton isActive={menuOpened}>
@@ -525,44 +488,43 @@ export const Header: React.FC = () => {
           <span></span>
         </MenuButton>
       </MenuButtonWrapper>
-      {(router.pathname === `/card/[id]` || router.pathname === `/cart`) && width && width > 1200 && (<BackButton/>)}
+      {(router.pathname === `/card/[id]` || router.pathname === `/cart`) && width && width > 1280 && (<BackButton/>)}
       <LogoWrapper>
         <Logo text={'PS'} type={'link'} href={'/'}/>
       </LogoWrapper>
       <Side>
         <CartButton onClick={onClickCartButton}>
-          <CartIndicator>{totalCount}</CartIndicator>
-          <i className="fal fa-shopping-bag"></i>
+          <IndicatorWrapper>
+            <Indicator count={totalCount}/>
+          </IndicatorWrapper>
+          <CartIcon as={CartIco}/>
         </CartButton>
-        {router.pathname !== `/profile` && (
-          <>
-            {userData
-              ? <User>
-                <Link href={"/profile"}>
-                  <UserWrapper>
-                    <Avatar>{userData.fullName.slice(0, 1)}</Avatar>
-                    <span>
-                    {userData.fullName.split(' ')[0]}
-                  </span>
-                  </UserWrapper>
-                </Link>
-                <Exit onClick={onClickExitUser}>
+        {userData
+          ? <User>
+            <Link href={"/profile"}>
+              <UserWrapper>
+                <Avatar>{userData.fullName.slice(0, 1)}</Avatar>
+                <span>
+                {userData.fullName.split(' ')[0]}
+              </span>
+              </UserWrapper>
+            </Link>
+            <Exit onClick={onClickExitUser}>
               <span>
                 Выйти
               </span>
-                  <i className="fal fa-sign-out"></i>
-                </Exit>
-              </User>
-              : <UserButton onClick={onClickUserButton}>
-                <i className="fal fa-user"></i>
-              </UserButton>}
-          </>)
-        }
-
+              <SignOutIcon as={SignOutIco}/>
+            </Exit>
+          </User>
+          : <UserButton onClick={onClickUserButton}>
+            <UserIcon as={UserIco}/>
+          </UserButton>}
       </Side>
-      <Menu/>
-      <CartModal selector='#modal-root'/>
-      <AuthModal selector='#modal-root'/>
+      <DynamicMenu/>
+      <DynamicCartModal selector='#modal-root'/>
+      <DynamicAuthModal selector='#modal-root'/>
     </HeaderEl>
   );
 }
+
+export default Header;

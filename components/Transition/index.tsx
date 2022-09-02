@@ -27,7 +27,7 @@ const getTransitionStyles: any = {
   },
 }
 
-export const Transition: React.FC<TransitionKind<ReactChild>> = ({ children, location }) => {
+const Transition: React.FC<TransitionKind<ReactChild>> = ({ children, location }) => {
   return (
     <TransitionGroup style={{position: "relative"}}>
       <ReactTransition
@@ -48,3 +48,5 @@ export const Transition: React.FC<TransitionKind<ReactChild>> = ({ children, loc
     </TransitionGroup>
   )
 }
+
+export default Transition;

@@ -10,7 +10,7 @@ interface RouteGuardProps {
   children: JSX.Element,
 }
 
-export const RouteGuard: FC<RouteGuardProps> = ({ children }): JSX.Element | null => {
+const RouteGuard: FC<RouteGuardProps> = ({ children }): JSX.Element | null => {
   const router = useRouter();
   const userData = useAppSelector(selectUserData);
   const dispatch = useAppDispatch();
@@ -30,3 +30,5 @@ export const RouteGuard: FC<RouteGuardProps> = ({ children }): JSX.Element | nul
 
   return children;
 }
+
+export default RouteGuard;

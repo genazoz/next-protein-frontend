@@ -2,10 +2,10 @@ import React from "react";
 import ReactFullpage from "@fullpage/react-fullpage";
 import styled from "styled-components";
 import theme from "../styles/theme";
-import {NewGoods, Preview} from "../components";
 import {NextPage} from "next";
 import {Api} from "../utils/api";
 import {ResponseProduct} from "../utils/api/types";
+import dynamic from "next/dynamic";
 
 const Main = styled.main`
   display: flex;
@@ -43,8 +43,8 @@ const Background = styled.span<{ isHidden: boolean }>`
   }
 
   ${(props) =>
-          props.isHidden &&
-          `height: 105px !important; 
+  props.isHidden &&
+  `height: 105px !important; 
     width: 1450px !important;
     @media (max-width: 1550px) {
         width: 95% !important;
@@ -69,6 +69,9 @@ interface HomeProps {
   goods: ResponseProduct[];
 }
 
+const DynamicPreview = dynamic(() => import(/*webpackChunkName: "Preview_DYNAMIC_IMPORT"*/'../components/Preview'))
+const DynamicNewGoods = dynamic(() => import(/*webpackChunkName: "NewGoods_DYNAMIC_IMPORT"*/'../components/NewGoods'))
+
 const Home: NextPage<HomeProps> = ({goods}) => {
   const [destinationIndex, setDestinationIndex] = React.useState(0);
 
@@ -88,10 +91,10 @@ const Home: NextPage<HomeProps> = ({goods}) => {
           return (
             <ReactFullpage.Wrapper>
               <div className="section">
-                <Preview destinationIndex={destinationIndex}/>
+                <DynamicPreview destinationIndex={destinationIndex}/>
               </div>
               <div className="section">
-                <NewGoods items={goods}/>
+                <DynamicNewGoods isShow={destinationIndex ? true : false} items={goods}/>
               </div>
             </ReactFullpage.Wrapper>
           );
@@ -103,7 +106,7 @@ const Home: NextPage<HomeProps> = ({goods}) => {
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const data = await Api().product.getPaginate(10, 1);
+    const data = await Api().product.getPaginate(9, 1);
 
     return {
       props: {
@@ -120,5 +123,6 @@ export const getServerSideProps = async (ctx: any) => {
     },
   };
 };
+
 
 export default Home;

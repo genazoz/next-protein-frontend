@@ -27,7 +27,7 @@ const CategoriesEl = styled.div`
 const Category = styled.li<{ isActive: boolean }>`
   height: max-content;
   margin: 30px 10px 0 0;
-  padding: 9px 21px;
+  padding: 9px 23px;
 
   font-family: ${theme.fonts.dinCondM};
   font-size: 13px;
@@ -74,8 +74,8 @@ const Category = styled.li<{ isActive: boolean }>`
     opacity: 1;
   }
 
-  @media (max-width: ${theme.media.tab}) {
-    font-size: ${theme.fontSizes.s};
+  @media (max-width: ${theme.media.tabSm}) {
+    font-size: 15px;
   }
 
   ${(props) =>

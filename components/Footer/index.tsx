@@ -4,6 +4,8 @@ import styled from "styled-components";
 import theme from "../../styles/theme";
 import Logo from "../Logo";
 import SquareIcon from "../SquareIcon";
+import InstagramImage from '../../public/svg/instagram.svg'
+import VkImage from '../../public/svg/vk.svg'
 
 const FooterEl = styled.footer<{ isFull: boolean }>`
   display: flex;
@@ -118,6 +120,18 @@ const SquareIcons = styled.div`
     margin: 0 10px 0 0;
   }
 `;
+const InstaImg = styled.svg`
+  width: 16px;
+  height: 16px;
+
+  fill: ${theme.colors.darkBlue};
+`
+const VkImg = styled.svg`
+  width: 20px;
+  height: 20px;
+
+  fill: ${theme.colors.darkBlue};
+`
 
 export const Footer: React.FC<{ isFull?: boolean }> = ({isFull = false}) => {
   return (
@@ -135,13 +149,13 @@ export const Footer: React.FC<{ isFull?: boolean }> = ({isFull = false}) => {
       <SquareIcons>
         <SquareIcon
           theme={"dark"}
-          text={<i className="fab fa-instagram"></i>}
+          text={<InstaImg as={InstagramImage}/>}
           type={"link"}
           href="https://www.instagram.com"
         />
         <SquareIcon
           theme={"dark"}
-          text={<i className="fab fa-vk"></i>}
+          text={<VkImg as={VkImage}/>}
           type={"link"}
           href="https://vk.com/genazozulya"
         />

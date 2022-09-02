@@ -1,5 +1,5 @@
 import {AxiosInstance} from "axios";
-import {CreateOrderProductDto, OrderItem, ResponseProduct} from "./types";
+import {CreateOrderProductDto, ResponseOrderProduct} from "./types";
 
 export const OrderProductApi = (instance: AxiosInstance) => ({
   async create(dto: CreateOrderProductDto) {
@@ -10,7 +10,7 @@ export const OrderProductApi = (instance: AxiosInstance) => ({
     return data;
   },
   async findByOrder(id: number) {
-    const {data} = await instance.get<ResponseProduct[]>(`/order-products/findByOrder/${id}`);
+    const {data} = await instance.get<ResponseOrderProduct[]>(`/order-products/findByOrder/${id}`);
     return data;
   },
 });

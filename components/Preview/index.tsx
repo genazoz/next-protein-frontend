@@ -6,7 +6,18 @@ import SquareIcon from "../SquareIcon";
 import Button from "../Button";
 import {useSelector} from "react-redux";
 import {useAppDispatch} from "../../app/hooks";
-import {settingsSelector, setPreviewSubmitHovered} from "../../features/settings/settingsSlice";
+import {setPreviewSubmitHovered, settingsSelector} from "../../features/settings/settingsSlice";
+import Image from "next/future/image";
+import InstagramImage from '../../public/svg/instagram.svg'
+import VkImage from '../../public/svg/vk.svg'
+import AtImage from '../../public/svg/at.svg'
+
+import ProteinImage from "../../public/img/Protein1.png";
+import ProteinImageMobile from "../../public/img/ProteinMob.png";
+import ProteinBarImage1 from "../../public/img/Bar.png";
+import ProteinBarImage2 from "../../public/img/Bar2.png";
+import ProteinBarImage3 from "../../public/img/Bar3.png";
+import useWindowDimensions from "../../@hooks/useWindowDimensions";
 
 const Section = styled.section`
   position: relative;
@@ -58,9 +69,9 @@ const Title = styled.h1`
   color: #e4e4e4;
 
   @media (max-width: ${theme.media.tabLg}) {
-     font-size: 100px;
-     margin-top: -70px;
-   }
+    font-size: 100px;
+    margin-top: -70px;
+  }
 
   @media (max-width: ${theme.media.tabSm}) {
     position: absolute;
@@ -71,7 +82,7 @@ const Title = styled.h1`
     margin: auto 0;
     padding-top: 0px;
     height: auto;
-    
+
     font-size: 60px;
     line-height: 30px;
   }
@@ -85,7 +96,7 @@ const Title = styled.h1`
   }
   @media (max-width: ${theme.media.mobSm}) {
     bottom: 170px;
-    
+
     font-size: 40px;
     line-height: 10px;
   }
@@ -103,9 +114,9 @@ const TitleLine = styled.span`
   background: ${theme.colors.darkBlue};
 
   @media (max-width: ${theme.media.tabLg}) {
-     padding: 13px 25px;
-     margin: 8px auto 0 0;
-   }
+    padding: 13px 25px;
+    margin: 8px auto 0 0;
+  }
 
   @media (max-width: ${theme.media.tabSm}) {
     padding: 25px 17px 15px 17px;
@@ -153,17 +164,18 @@ const ImageWrapper = styled.div`
     height: 190px;
   }
 `;
-const ImageProteinWrapper = styled(ImageWrapper)<{isHidden: number}>`
+const ImageProteinWrapper = styled(ImageWrapper)<{ isHidden: number }>`
   transition: 0.8s transform;
   transition-timing-function: cubic-bezier(0.85, 0.01, 0.2, 0.99);
 
   ${(props) =>
-    props.isHidden
-      ? `transform: translateY(-120vh)`
-      : `transform: translateY(0vh)`}
+          props.isHidden
+                  ? `transform: translateY(-120vh)`
+                  : `transform: translateY(0vh)`}
 `;
 const ImageProtein = styled.img`
   width: 230%;
+  height: auto;
   z-index: 1;
   margin-top: -26px;
   margin-left: -2px;
@@ -185,7 +197,7 @@ const ImageProtein = styled.img`
     margin-left: -6px;
   }
 `;
-const CircleWrapper = styled(ImageWrapper)<{isHidden: number; isFullscreen: boolean}>`
+const CircleWrapper = styled(ImageWrapper)<{ isHidden: number; isFullscreen: boolean }>`
   z-index: 0;
   top: 0;
 
@@ -223,15 +235,15 @@ const Contacts = styled.div`
   width: 280px;
 
   text-align: left;
-  
+
   p {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   @media (max-width: ${theme.media.tabLg}) {
     display: flex;
     flex-direction: row;
-    grid-gap: 25px;
+    gap: 25px;
     width: 100%;
     margin-bottom: 0px;
   }
@@ -258,7 +270,7 @@ const Contacts = styled.div`
 
     grid-gap: 0;
   }
-  @media (max-width: 300px)  {
+  @media (max-width: 300px) {
     justify-content: flex-start;
   }
 `;
@@ -267,7 +279,7 @@ const SocialLinks = styled.div`
     order: 2;
     width: 100%;
   }
-  @media (max-width: 300px)  {
+  @media (max-width: 300px) {
     display: none;
   }
 
@@ -283,9 +295,9 @@ const SubscribeWrapper = styled.div`
   h2 {
     color: ${theme.colors.darkBlue};
   }
-  
+
   p {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   @media (max-width: ${theme.media.tabLg}) {
@@ -336,7 +348,7 @@ const SquareIcons = styled.div`
 const ButtonWrapper = styled.div`
   margin: 10px 0 0 0;
 `;
-const ProteinBarWrapper = styled.div<{speed: number; isHidden: number}>`
+const ProteinBarWrapper = styled.div<{ speed: number; isHidden: number }>`
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -348,9 +360,9 @@ const ProteinBarWrapper = styled.div<{speed: number; isHidden: number}>`
   transition-timing-function: cubic-bezier(0.85, 0.01, 0.2, 0.99);
 
   ${(props) =>
-    props.isHidden
-      ? `transform: translateY(-220vh)`
-      : `transform: translateY(0vh)`}
+          props.isHidden
+                  ? `transform: translateY(-220vh)`
+                  : `transform: translateY(0vh)`}
 `;
 const ProteinBarImg = styled.img`
   position: absolute;
@@ -394,9 +406,27 @@ const ProteinBarImg3 = styled(ProteinBarImg)`
 
   filter: blur(10px);
 `;
+const InstaImg = styled.svg`
+  width: 16px;
+  height: 16px;
 
-export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex }) => {
-  const { previewSubmitHovered } = useSelector(settingsSelector);
+  fill: ${theme.colors.darkBlue};
+`
+const VkImg = styled.svg`
+  width: 20px;
+  height: 20px;
+
+  fill: ${theme.colors.darkBlue};
+`
+const AtImg = styled.svg`
+  width: 17px;
+  height: 17px;
+  
+  fill: ${theme.colors.darkBlue};
+`
+
+const Preview: React.FC<{ destinationIndex: number }> = ({destinationIndex}) => {
+  const {previewSubmitHovered} = useSelector(settingsSelector);
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
@@ -459,17 +489,18 @@ export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex
   const onSubmitBlur = () => {
     dispatch(setPreviewSubmitHovered(false));
   };
+  const {width} = useWindowDimensions();
 
   return (
     <Section>
       <ProteinBarWrapper speed={0.92} isHidden={destinationIndex}>
-        <ProteinBarImg className={"js-img-parallax1"} src={"img/Bar.png"} />
+        <ProteinBarImg as={Image} className={"js-img-parallax1"} src={ProteinBarImage1}/>
       </ProteinBarWrapper>
       <ProteinBarWrapper speed={0.88} isHidden={destinationIndex}>
-        <ProteinBarImg2 className={"js-img-parallax2"} src={"img/Bar2.png"} />
+        <ProteinBarImg2 as={Image} className={"js-img-parallax2"} src={ProteinBarImage2}/>
       </ProteinBarWrapper>
       <ProteinBarWrapper speed={0.9} isHidden={destinationIndex}>
-        <ProteinBarImg3 className={"js-img-parallax3"} src={"img/Bar3.png"} />
+        <ProteinBarImg3 as={Image} className={"js-img-parallax3"} src={ProteinBarImage3}/>
       </ProteinBarWrapper>
       <Wrapper>
         <Title>
@@ -482,16 +513,18 @@ export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex
           isFullscreen={previewSubmitHovered ? true : false}
           className={`js-preview-image-wrapper`}
         >
-          <Circle className={"js-circle"} />
+          <Circle className={"js-circle"}/>
         </CircleWrapper>
         <ImageProteinWrapper
           isHidden={destinationIndex || previewSubmitHovered ? 1 : 0}
           className={`js-preview-image-wrapper`}
         >
           <ImageProtein
+            as={Image}
             className={"js-protein-image"}
-            src="img/Protein1.png"
+            src={width && width > 800 ? ProteinImage : ProteinImageMobile}
             alt="protein"
+            priority
           />
         </ImageProteinWrapper>
         <Contacts>
@@ -501,13 +534,13 @@ export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex
             <SquareIcons>
               <SquareIcon
                 theme={"dark"}
-                text={<i className="fab fa-instagram"></i>}
+                text={<InstaImg as={InstagramImage}/>}
                 type={"link"}
                 href="https://www.instagram.com"
               />
               <SquareIcon
                 theme={"dark"}
-                text={<i className="fab fa-vk"></i>}
+                text={<VkImg as={VkImage}/>}
                 type={"link"}
                 href="https://vk.com/genazozulya"
               />
@@ -517,8 +550,8 @@ export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex
             <h2>Присоединяйтесь!</h2>
             <p>Введите ваш e-mail ниже, чтобы быть в курсе всех новостей</p>
             <Subscribe>
-              <SquareIcon theme={"dark"} text={<i className="far fa-at"></i>} />
-              <Input type="text" placeholder="Введите email..." />
+              <SquareIcon theme={"dark"} text={<AtImg as={AtImage}/>}/>
+              <Input type="text" placeholder="Введите email..."/>
             </Subscribe>
             <ButtonWrapper
               onMouseLeave={() => onSubmitBlur()}
@@ -534,3 +567,5 @@ export const Preview: React.FC<{destinationIndex: number}> = ({ destinationIndex
     </Section>
   );
 }
+
+export default Preview;

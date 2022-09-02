@@ -10,7 +10,6 @@ import {Login} from "./forms/Login";
 import {Register} from "./forms/Register";
 import { CSSTransition } from 'react-transition-group';
 
-
 const Wrapper = styled.div`
   position: fixed;
   z-index: 110;
@@ -107,7 +106,7 @@ export enum formEnum {
   REGISTER = 'register'
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({selector}) => {
+const AuthModal: React.FC<AuthModalProps> = ({selector}) => {
   const {showAuthModal} = useSelector(settingsSelector);
   const dispatch = useAppDispatch();
 
@@ -136,3 +135,5 @@ export const AuthModal: React.FC<AuthModalProps> = ({selector}) => {
     </ClientOnlyPortal>
   )
 }
+
+export default AuthModal;

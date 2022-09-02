@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import theme from "../../styles/theme";
 import { useRouter } from 'next/router'
+import ArrowLeftIco from '../../public/svg/arrow-left.svg'
 
 const Button = styled.div`
   position: absolute;
@@ -23,21 +24,17 @@ const Button = styled.div`
   border-radius: 20px;
   cursor: pointer;
 
-  i {
-    margin-right: 7px;
-
-    font-size: 19px;
-  }
-
-  @media (max-width: ${theme.media.tab}) {
-    color: ${theme.colors.darkBlue};
-    background: transparent;
-
-    i {
-      font-size:  20px;
-    }
+  svg {
+    width: 11px;
+    margin: 0 7px 1px 0;
   }
 `;
+const ArrowLeftIcon = styled.svg`
+  width: 16px;
+  height: 16px;
+  
+  fill: ${theme.colors.green};
+`
 
 export const BackButton:React.FC = () => {
   const router = useRouter()
@@ -45,7 +42,7 @@ export const BackButton:React.FC = () => {
   return (
     <>
       <Button onClick={() => router.back()}>
-        <i className="fal fa-angle-left"></i>
+        <ArrowLeftIcon as={ArrowLeftIco}/>
         Назад
       </Button>
     </>

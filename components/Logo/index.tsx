@@ -12,7 +12,7 @@ const Logo = styled.div<{big: boolean}>`
   margin: 0;
 
   font-family: ${theme.fonts.bebasB};
-  font-size: calc(16px + 12px);
+  font-size: 28px;
   
   cursor: pointer;
 
@@ -38,7 +38,7 @@ const Logo = styled.div<{big: boolean}>`
       `font-size: 36px;
       
         @media (max-width: ${theme.media.mob}) {
-          font-size: 30px;
+          font-size: 34px;
         }`}
   }
 

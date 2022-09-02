@@ -114,7 +114,7 @@ const Footer = styled.footer`
 const Details = styled.div`
   display: flex;
   width: 100%;
-  gap: 40px;
+  gap: 60px;
 
   font-family: ${theme.fonts.dinCondM};
   font-size: 18px;
@@ -151,7 +151,7 @@ const Buttons = styled.div`
       width: 100%;
     }
   }
-  @media (max-width: ${theme.media.mob}) {
+  @media (max-width: 390px) {
     display: flex;
     flex-direction: column;
   }
@@ -260,6 +260,7 @@ function CartPage() {
           imageUrl: product.imageUrl,
           category: product.category,
           price: product.price,
+          prodId: product.id,
           orderId: data.id,
         })
       })

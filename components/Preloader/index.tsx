@@ -1,5 +1,6 @@
 import React, {FC} from "react";
 import styled from "styled-components";
+
 import theme from "../../styles/theme";
 import ShapeOverlays from "../../libs/shapeOverlays";
 import {useAppDispatch} from "../../app/hooks";
@@ -29,6 +30,9 @@ const Counter = styled.h1`
   transition: 0.4s opacity;
 
   @media (max-width: ${theme.media.tab}) {
+    font-size: 280px;
+  }
+  @media (max-width: ${theme.media.mobSm}) {
     font-size: 200px;
   }
 `;
@@ -42,7 +46,7 @@ interface PreloaderProps {
   selector: string
 }
 
-export const Preloader: FC<PreloaderProps> = ({selector}) => {
+const Preloader: FC<PreloaderProps> = ({selector}) => {
   const dispatch = useAppDispatch();
 
   const loadPreloader = () => {
@@ -93,3 +97,5 @@ export const Preloader: FC<PreloaderProps> = ({selector}) => {
     </ClientOnlyPortal>
   );
 }
+
+export default Preloader;

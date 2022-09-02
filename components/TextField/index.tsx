@@ -31,6 +31,9 @@ const Input = styled.input`
 
   transition: .15s background-color, .15s border-color;
 
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px rgba(20, 19, 45, .8) inset;
+  }
 
   &:hover, &:focus {
     border: 1px solid rgba(255, 255, 255, .4);

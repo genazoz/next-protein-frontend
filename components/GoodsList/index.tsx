@@ -2,8 +2,8 @@ import React from "react";
 
 import styled from "styled-components";
 import theme from "../../styles/theme";
-import {CardCatalog} from "../";
 import {ResponseProduct} from "../../utils/api/types";
+import dynamic from "next/dynamic";
 
 const GoodsListEl = styled.div<{loading: boolean}>`
   display: grid;
@@ -52,10 +52,12 @@ type GoodsListProps = {
   loading?: boolean
 }
 
+const DynamicCardCatalog = dynamic(() => import(/*webpackChunkName: "CardCatalog_DYNAMIC_IMPORT"*/'../CardCatalog'))
+
 export const GoodsList: React.FC<GoodsListProps> = ({items, loading = false}) => {
   return (
     <GoodsListEl loading={loading}>
-      {items.map((goods, index) => <CardCatalog {...goods} key={index} />)}
+      {items.map((goods, index) => <DynamicCardCatalog {...goods} key={index} />)}
     </GoodsListEl>
   );
 }

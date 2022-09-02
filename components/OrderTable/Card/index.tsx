@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 
-import {OrderItem, OrderStatus, ResponseProduct} from "../../../utils/api/types";
+import {OrderItem, OrderStatus, ResponseOrderProduct} from "../../../utils/api/types";
 import styled from "styled-components";
 import {Api} from "../../../utils/api";
 import {CardOrder} from "../../CardOrder";
 import theme from "../../../styles/theme";
+import ArrowRightIco from '../../../public/svg/arrow-right.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -79,12 +80,20 @@ const ShowProductsButton = styled.button`
   color: rgba(27, 188, 155, 1);
   border-radius: 7px;
 `;
+const ArrowRightIcon = styled.svg`
+  width: 14px;
+  height: 16px;
+
+  transform: scale(.9);
+  
+  fill: ${theme.colors.green};
+`
 
 interface OrderCardProps extends OrderItem {
 }
 
 export const OrderCard: React.FC<OrderCardProps> = ({id, status, price, count, createdAt}) => {
-  const [products, setProducts] = useState<ResponseProduct[] | []>([]);
+  const [products, setProducts] = useState<ResponseOrderProduct[] | []>([]);
 
   const onClickShowProducts = async () => {
     if (products.length !== 0) {
@@ -94,7 +103,6 @@ export const OrderCard: React.FC<OrderCardProps> = ({id, status, price, count, c
 
     try {
       const data = await Api().orderProduct.findByOrder(id);
-      console.log(data)
       setProducts(data);
     } catch (err) {
       console.log(err);
@@ -130,7 +138,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({id, status, price, count, c
           </Cell>
           <Cell>
             <ShowProductsButton onClick={onClickShowProducts}>
-              <i className={'far fa-long-arrow-right'}></i>
+              <ArrowRightIcon as={ArrowRightIco}/>
             </ShowProductsButton>
           </Cell>
         </Wrapper>
@@ -143,7 +151,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({id, status, price, count, c
             ))}
           </Cards>
           <ShowProductsButton onClick={onClickShowProducts}>
-            <i className={'far fa-long-arrow-right'}></i>
+            <ArrowRightIcon as={ArrowRightIco}/>
           </ShowProductsButton>
         </CardsWrapper>}
     </>
