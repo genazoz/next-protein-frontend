@@ -15,6 +15,5 @@ export const ClientOnlyPortal: FC<ClientOnlyPortalProps> = ({ selector, children
     setMounted(true)
   }, [selector])
 
-  // @ts-ignore
-  return mounted ? createPortal(children, ref.current) : children
+  return mounted && ref.current ? createPortal(children, ref.current) : children
 }

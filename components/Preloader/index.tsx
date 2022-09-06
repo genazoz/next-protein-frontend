@@ -1,86 +1,48 @@
-import React, {FC} from "react";
-import styled from "styled-components";
+import React, {FC, useRef} from "react";
 
-import theme from "../../styles/theme";
 import ShapeOverlays from "../../libs/shapeOverlays";
-import {useAppDispatch} from "../../app/hooks";
-import {Overlay} from "./overlay";
 import {ClientOnlyPortal} from "../ClientOnlyPortal";
-import {setShowPreloader} from "../../features/settings/settingsSlice";
+import styled from "styled-components";
+import theme from "../../styles/theme";
 
-const Loading = styled.div`
+const OverlayEl = styled.svg`
   position: fixed;
-  z-index: 103;
+  z-index: 101;
+  top: 0;
+  left: 0;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
 
-  transition: 0.25s opacity;
-`;
-const Counter = styled.h1`
-  color: #eee;
-  font-size: 500px;
-
+  background: white;
   pointer-events: none;
-  opacity: 0;
-
-  transition: 0.4s opacity;
-
-  @media (max-width: ${theme.media.tab}) {
-    font-size: 280px;
+`;
+const Path = styled.path`
+  &:nth-child(1),
+  &:nth-child(4) {
+    fill: white;
   }
-  @media (max-width: ${theme.media.mobSm}) {
-    font-size: 200px;
+  &:nth-child(2) {
+    fill: ${theme.colors.green};
+  }
+  &:nth-child(3) {
+    fill: ${theme.colors.darkBlue};
   }
 `;
-const textObject = {
-  overlayClass: "js-preloader-overlay",
-  preloaderClass: "js-preloader",
-  preloaderTitleClass: "js-preloader-title",
-};
 
 interface PreloaderProps {
   selector: string
 }
 
 const Preloader: FC<PreloaderProps> = ({selector}) => {
-  const dispatch = useAppDispatch();
+  const overlayRef = useRef<SVGSVGElement>(null);
 
   const loadPreloader = () => {
-    const $overlay = document.querySelector(`.${textObject.overlayClass}`) as HTMLElement;
-    const $preloader = document.querySelector(`.${textObject.preloaderClass}`) as HTMLElement;
-    const $title = document.querySelector(`.${textObject.preloaderTitleClass}`) as HTMLElement;
+    if (!overlayRef.current) return;
 
-    if (!$overlay) return;
-    const overlay = new ShapeOverlays($overlay);
-    let counter = 0;
-
-    if (!$title)
-      return;
-
-    $title.style.opacity = "1";
-    let interval = setInterval(() => {
-      $title.innerHTML = `${counter}`;
-      counter++;
-
-      if (counter === 85) {
-        $preloader.style.opacity = "0";
-        $preloader.style.pointerEvents = "none";
-      }
-      if (counter === 95) {
-        clearInterval(interval);
-        overlay.toggle();
-        $overlay.style.background = "transparent";
-
-        setTimeout(function () {
-          dispatch(setShowPreloader(false));
-        }, 1500);
-      }
-    }, 10);
-  };
+    new ShapeOverlays(overlayRef.current).toggle();
+    overlayRef.current.style.background = "transparent";
+  }
 
   React.useEffect(() => {
     setTimeout(() => loadPreloader())
@@ -88,12 +50,9 @@ const Preloader: FC<PreloaderProps> = ({selector}) => {
 
   return (
     <ClientOnlyPortal selector={selector}>
-      <>
-        <Loading className={`${textObject.preloaderClass}`}>
-          <Counter className={`${textObject.preloaderTitleClass}`}>0</Counter>
-        </Loading>
-        <Overlay/>
-      </>
+      <OverlayEl viewBox="0 0 100 100" preserveAspectRatio="none" ref={overlayRef} >
+        {[...Array(4)].map((index) => <Path key={index} />)}
+      </OverlayEl>
     </ClientOnlyPortal>
   );
 }
