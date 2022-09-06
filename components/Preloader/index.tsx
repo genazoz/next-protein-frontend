@@ -1,11 +1,12 @@
-import React, {FC, useRef} from "react";
+import React, {FC, useRef, useState} from "react";
+import { CSSTransition } from 'react-transition-group';
 
 import ShapeOverlays from "../../libs/shapeOverlays";
 import {ClientOnlyPortal} from "../ClientOnlyPortal";
 import styled from "styled-components";
 import theme from "../../styles/theme";
 
-const OverlayEl = styled.svg`
+const OverlayWrapper = styled.div<{isHidden: boolean}>`
   position: fixed;
   z-index: 101;
   top: 0;
@@ -13,8 +14,17 @@ const OverlayEl = styled.svg`
 
   width: 100vw;
   height: 100vh;
+  
+  background-color: #FFF;
 
-  background: white;
+  ${props => props.isHidden && `
+    background-color: transparent;
+  `}
+`
+const OverlayEl = styled.svg`
+  width: 100%;
+  height: 100%;
+  
   pointer-events: none;
 `;
 const Path = styled.path`
@@ -35,24 +45,31 @@ interface PreloaderProps {
 }
 
 const Preloader: FC<PreloaderProps> = ({selector}) => {
+  const [showPreloader, setShowPreloader] = useState(true);
+  const overlayWrapperRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<SVGSVGElement>(null);
 
-  const loadPreloader = () => {
-    if (!overlayRef.current) return;
-
-    new ShapeOverlays(overlayRef.current).toggle();
-    overlayRef.current.style.background = "transparent";
-  }
-
   React.useEffect(() => {
-    setTimeout(() => loadPreloader())
+    setTimeout(() => {
+      if (overlayRef.current) {
+        setShowPreloader(false);
+        new ShapeOverlays(overlayRef.current).toggle();
+      }
+    }, 100)
   }, []);
 
   return (
     <ClientOnlyPortal selector={selector}>
-      <OverlayEl viewBox="0 0 100 100" preserveAspectRatio="none" ref={overlayRef} >
-        {[...Array(4)].map((index) => <Path key={index} />)}
-      </OverlayEl>
+        <CSSTransition in={showPreloader} classNames={'preloader'} timeout={1000} unmountOnExit>
+          <OverlayWrapper isHidden={!showPreloader} ref={overlayWrapperRef}>
+            <OverlayEl viewBox="0 0 100 100" preserveAspectRatio="none" ref={overlayRef} >
+              <Path />
+              <Path />
+              <Path />
+              <Path />
+            </OverlayEl>
+          </OverlayWrapper>
+        </CSSTransition>
     </ClientOnlyPortal>
   );
 }
