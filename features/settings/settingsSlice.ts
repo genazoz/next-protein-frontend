@@ -1,9 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {RootState} from "../../app/store";
-import {userSlice} from "../user/userSlice";
 
 interface SettingsSliceState {
-  url: string,
   goodsPerPage: number,
   menuOpened: boolean,
   showPreloader: boolean,
@@ -13,7 +11,6 @@ interface SettingsSliceState {
 }
 
 const initialState: SettingsSliceState = {
-  url: `https://62ad406c402135c7acbe4f1c.mockapi.io/`,
   goodsPerPage: 24,
   menuOpened: false,
   showPreloader: true,
@@ -46,6 +43,6 @@ export const settingsSlice = createSlice({
 
 export const settingsSelector = (state: RootState) => state.settings;
 
-export const {setMenuOpened, setShowPreloader, setPreviewSubmitHovered, setShowCart, setShowAuthModal} = settingsSlice.actions
+export const {setMenuOpened, setPreviewSubmitHovered, setShowCart, setShowAuthModal} = settingsSlice.actions
 
 export const settingsReducer = settingsSlice.reducer
