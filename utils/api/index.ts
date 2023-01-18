@@ -20,7 +20,7 @@ export const Api = (
   const token = cookies.proteinUserToken;   // proteinToken - чтобы токены не повторялись именами token
 
   const instance = axios.create({
-    baseURL: 'https://protein-nest.herokuapp.com',
+    baseURL: 'https://protein-nest.up.railway.app/',
     headers: {
       Authorization: "Bearer " + token,
     },
