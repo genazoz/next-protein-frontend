@@ -20,7 +20,7 @@ export const Api = (
   const token = cookies.proteinUserToken;   // proteinToken - чтобы токены не повторялись именами token
 
   const instance = axios.create({
-    baseURL: 'http://77.222.54.210:5000/',
+    baseURL: 'https://77.222.54.210',
     headers: {
       Authorization: "Bearer " + token,
     },
